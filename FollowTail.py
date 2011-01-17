@@ -20,13 +20,27 @@ class FollowTail:
         obj, callback, a, kw = self.fileObj, self.callback, self.a, self.kw
         obj.seek(obj.tell())
         for line in obj:
-            callback(line, *a, **kw)
-            
+            line = line.strip()
+            callback(line, self.filename, *a, **kw)
+
+    def stop(self):
+        if self.lc.running:
+            self.lc.stop()
+        if self.fileObj:
+            self.fileObj.close()
+            self.fileObj = None
 
 class ChainCallback:
     def __init__(self, *callbacks):
-        self.callbacks = callbacks
+        self.callbacks = list(callbacks)
         
     def __call__(self, *a, **kw):
         for callback in self.callbacks:
             callback(*a, **kw)
+            
+    def addCallback(self, callback):
+        self.callbacks.append(callback)
+        
+    def removeCallback(self, callback):
+        if callback in self.callbacks:
+            self.callbacks.remove(callback)
