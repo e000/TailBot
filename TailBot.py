@@ -21,7 +21,7 @@ class TailBot(IRCClient):
             
     def connectionLost(self, reason):
         for tail, caller in self.factory.tails:
-            caller.addCallback(self.fileUpdated)
+            caller.removeCallback(self.fileUpdated)
             
     def joined(self, channel):
         self.channelsIn.add(channel.lower())
